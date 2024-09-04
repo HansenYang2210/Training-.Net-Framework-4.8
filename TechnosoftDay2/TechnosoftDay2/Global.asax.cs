@@ -27,6 +27,7 @@ namespace TechnosoftDay2
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+            //Inisiasi Instance Container milik Simple Injector
             var container = new Container();
             container.Options.DefaultScopedLifestyle = new SimpleInjector.Lifestyles.AsyncScopedLifestyle();
 
@@ -34,17 +35,17 @@ namespace TechnosoftDay2
 
             //Regist MediaTr
             RegisterMediatR(container);
+
             //Regist DB Context
             container.Register<CountryContext>(Lifestyle.Scoped);
+
             //Regist AutoMapper
             RegisterAutoMapper(container);
+
             //Regist FluentValidation
             //RegisterFluentValidation(container);
             RegisterValidators(container, Assembly.GetExecutingAssembly());
-            //container.RegisterSingleton<IValidator<Request.Retrieve.ListQuery>, ListQueryValidator>();
-            //container.RegisterSingleton<IValidator<Request.Create.Command>, CreateValidator>();
 
-            //container.Register<IValidator<ListQueryValidator>>(Lifestyle.Scoped);
             //Regis Pipeline
             container.Collection.Register(typeof(INotificationHandler<>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionAction<,>), Assembly.GetExecutingAssembly());
@@ -59,11 +60,9 @@ namespace TechnosoftDay2
 
             container.Collection.Register(typeof(IRequestPreProcessor<>));
             container.Collection.Register(typeof(IRequestPostProcessor<,>));
-            //End
 
             //Regis ServiceProvider
             container.RegisterInstance<IServiceProvider>(container);
-            //end
 
             container.Verify();
             GlobalConfiguration.Configuration.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);

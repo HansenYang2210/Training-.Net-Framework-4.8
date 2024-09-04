@@ -34,7 +34,7 @@ namespace TechnosoftDay2.Request
             {
                 //var fields = query.Select.Any() ? query.Select : new List<string> { "id", "name", "versionNumber", "callingCode" };
                 var countriesQuery = _context.Countries
-                    .OrderBy(x => x.Id)
+                    .OrderByDescending(x => x.Id)
                     .AsQueryable();
 
                 if(query.PageNumber == 0 && query.PageSize == 0)

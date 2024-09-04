@@ -43,7 +43,6 @@ namespace TechnosoftDay2.Request
                     CallingCode = command.CallingCode,
                     VersionNumber = GenerateRandomByteArray(18)
                 };
-                string newVersionNumber = country.VersionNumber.ToString();
 
                 var checkCountry = await _context.Countries
                 .FirstOrDefaultAsync(c => c.Name == command.Name, ct);
