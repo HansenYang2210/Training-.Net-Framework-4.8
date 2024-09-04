@@ -30,23 +30,23 @@ namespace TechnosoftDay2.Controllers
             [FromUri] Retrieve.ListQuery query, CancellationToken cancellationToken)
         {
             ListQueryValidator validator = new ListQueryValidator();
-            ValidationResult result =  validator.Validate(query);
-            if (!result.IsValid)
-            {
-                var errors = result.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-                var errorResponse = new
-                {
-                    Errors = errors
-                };
-                return BadRequest(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
-            }
-            else
-            {
-                return Ok(await _mediator.Send(query ?? new Retrieve.ListQuery(), cancellationToken));
-            }
 
+            if(query != null)
+            {
+                ValidationResult result = validator.Validate(query);
+                if (!result.IsValid)
+                {
+                    var errors = result.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
+                    var errorResponse = new
+                    {
+                        Errors = errors
+                    };
+                    return BadRequest(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
+                }
+            }
+            return Ok(await _mediator.Send(query ?? new Retrieve.ListQuery(), cancellationToken));
         }
 
         [Route("{id:guid}")]

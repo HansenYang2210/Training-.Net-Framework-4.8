@@ -37,10 +37,13 @@ namespace TechnosoftDay2.Request
                     .OrderByDescending(x => x.Id)
                     .AsQueryable();
 
-                if(query.PageNumber == 0 && query.PageSize == 0)
+
+                var totalRecords = await _context.Countries.CountAsync(ct);
+
+                if (query.PageNumber == 0 && query.PageSize == 0)
                 {
                     query.PageNumber = 1;
-                    query.PageSize = 5;
+                    query.PageSize = totalRecords;
                 }
 
                 var pagedCountries = await countriesQuery.
@@ -57,7 +60,6 @@ namespace TechnosoftDay2.Request
                 }).ToList();
 
 
-                var totalRecords = await _context.Countries.CountAsync(ct);
                 var hasNextPage = (query.PageNumber * query.PageSize) < totalRecords;
 
                 return new ListResponse
