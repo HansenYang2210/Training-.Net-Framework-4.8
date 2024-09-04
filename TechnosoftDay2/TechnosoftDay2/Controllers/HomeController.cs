@@ -107,7 +107,7 @@ namespace TechnosoftDay2.Controllers
         {
 
             UpdateValidator validator = new UpdateValidator();
-            ValidationResult result = validator.Validate(command);
+            ValidationResult result = validator.Validate(command2);
             if (!result.IsValid)
             {
                 var errors = result.Errors
