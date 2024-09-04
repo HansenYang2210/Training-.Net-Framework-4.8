@@ -37,6 +37,12 @@ namespace TechnosoftDay2.Request
                     .OrderBy(x => x.Id)
                     .AsQueryable();
 
+                if(query.PageNumber == 0 && query.PageSize == 0)
+                {
+                    query.PageNumber = 1;
+                    query.PageSize = 5;
+                }
+
                 var pagedCountries = await countriesQuery.
                     Skip((query.PageNumber - 1) * query.PageSize)
                     .Take(query.PageSize)

@@ -12,6 +12,8 @@ using System;
 using FluentValidation;
 using System.Linq;
 using MediatR.Pipeline;
+using FluentValidation.WebApi;
+using TechnosoftDay2.Validator;
 
 namespace TechnosoftDay2
 {
@@ -19,8 +21,13 @@ namespace TechnosoftDay2
     {
         protected void Application_Start()
         {
-            var container = new Container();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            AreaRegistration.RegisterAllAreas();
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+            var container = new Container();
             container.Options.DefaultScopedLifestyle = new SimpleInjector.Lifestyles.AsyncScopedLifestyle();
 
             container.RegisterWebApiControllers(GlobalConfiguration.Configuration);
@@ -32,14 +39,16 @@ namespace TechnosoftDay2
             //Regist AutoMapper
             RegisterAutoMapper(container);
             //Regist FluentValidation
-            RegisterFluentValidation(container);
+            //RegisterFluentValidation(container);
+            RegisterValidators(container, Assembly.GetExecutingAssembly());
+            //container.RegisterSingleton<IValidator<Request.Retrieve.ListQuery>, ListQueryValidator>();
+            //container.RegisterSingleton<IValidator<Request.Create.Command>, CreateValidator>();
+
             //container.Register<IValidator<ListQueryValidator>>(Lifestyle.Scoped);
             //Regis Pipeline
             container.Collection.Register(typeof(INotificationHandler<>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionAction<,>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionHandler<,,>), Assembly.GetExecutingAssembly());
-            container.Collection.Register(typeof(IStreamRequestHandler<,>), Assembly.GetExecutingAssembly());
-
             container.Collection.Register(typeof(IPipelineBehavior<,>), new[]
             {
                 typeof(RequestExceptionProcessorBehavior<,>),
@@ -58,11 +67,7 @@ namespace TechnosoftDay2
 
             container.Verify();
             GlobalConfiguration.Configuration.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);
-            GlobalConfiguration.Configure(WebApiConfig.Register);
-            AreaRegistration.RegisterAllAreas();
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            
         }
 
 
@@ -88,11 +93,10 @@ namespace TechnosoftDay2
             });
         }
 
-        private void RegisterFluentValidation(Container container)
+        private static void RegisterValidators(Container container, Assembly assembly)
         {
-            var validatorTypes = Assembly.GetExecutingAssembly().GetTypes()
-                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>)))
-                .ToList();
+            var validatorTypes = assembly.GetTypes()
+                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>)));
 
             foreach (var validatorType in validatorTypes)
             {
