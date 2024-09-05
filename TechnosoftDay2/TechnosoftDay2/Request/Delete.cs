@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using TechnosoftDay2.Context;
+using FluentValidation;
 
 namespace TechnosoftDay2.Request
 {
@@ -19,6 +20,14 @@ namespace TechnosoftDay2.Request
         {
             public Guid Id { get; set; }
             public byte[] VersionNumber { get; set; }
+        }
+        public class DeleteValidator : AbstractValidator<Command>
+        {
+            public DeleteValidator()
+            {
+                RuleFor(x => x.Id)
+                    .NotEmpty().WithMessage("ID must be filled.");
+            }
         }
 
         public class Handler : IRequestHandler<Command, DeleteResponse>

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using TechnosoftDay2.Context;
 using System.Data.Entity;
+using FluentValidation;
 
 namespace TechnosoftDay2.Request
 {
@@ -21,6 +22,20 @@ namespace TechnosoftDay2.Request
         {
             public Guid Id { get; set; }
             public byte[] VersionNumber { get; set; }
+        }
+
+        public class CreateValidator : AbstractValidator<Command>
+        {
+            public CreateValidator()
+            {
+                RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("Name is required.")
+                .Matches(@"^[^\d]*$").WithMessage("Name cannot contain numbers.");
+
+                RuleFor(x => x.CallingCode)
+                .NotEmpty().WithMessage("CallingCode is required.")
+                .Matches(@"^[^\d]*$").WithMessage("CallingCode cannot contain numbers.");
+            }
         }
 
         public class Handler : IRequestHandler<Command, CreateResponse>

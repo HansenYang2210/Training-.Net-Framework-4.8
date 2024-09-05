@@ -13,7 +13,8 @@ using FluentValidation;
 using System.Linq;
 using MediatR.Pipeline;
 using FluentValidation.WebApi;
-using TechnosoftDay2.Validator;
+using TechnosoftDay2.Request;
+using System.CodeDom;
 
 namespace TechnosoftDay2
 {
@@ -44,10 +45,13 @@ namespace TechnosoftDay2
 
             //Regist FluentValidation
             //RegisterFluentValidation(container);
-            RegisterValidators(container, Assembly.GetExecutingAssembly());
+
+            //container.Register<Retrieve.ListQueryValidator>(Lifestyle.Scoped);
 
             //Regis Pipeline
             container.Collection.Register(typeof(INotificationHandler<>), Assembly.GetExecutingAssembly());
+            container.Collection.Register(typeof(ValidatorBehaviour<,>), Assembly.GetExecutingAssembly());
+            //container.Collection.Register(typeof(AbstractValidator<>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionAction<,>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionHandler<,,>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IPipelineBehavior<,>), new[]
@@ -56,7 +60,14 @@ namespace TechnosoftDay2
                 typeof(RequestExceptionActionProcessorBehavior<,>),
                 typeof(RequestPreProcessorBehavior<,>),
                 typeof(RequestPostProcessorBehavior<,>),
+                typeof(ValidatorBehaviour<,>),
             });
+            container.Register(typeof(AbstractValidator<>), Assembly.GetExecutingAssembly());
+            //container.Collection.Register(typeof(AbstractValidator<>), new[]
+            //{
+            //    typeof(Retrieve.ListQueryValidator)
+            //});
+
 
             container.Collection.Register(typeof(IRequestPreProcessor<>));
             container.Collection.Register(typeof(IRequestPostProcessor<,>));
@@ -92,21 +103,20 @@ namespace TechnosoftDay2
             });
         }
 
-        private static void RegisterValidators(Container container, Assembly assembly)
-        {
-            var validatorTypes = assembly.GetTypes()
-                .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>)));
+        //private void RegisterValidators(Container container)
+        //{
+        //    var validatorTypes = new[]
+        //    {
+        //    typeof(Retrieve.ListQueryValidator),
+        //    typeof(Retrieve.ListQuery),
+        //};
 
-            foreach (var validatorType in validatorTypes)
-            {
-                var validatorInterfaces = validatorType.GetInterfaces()
-                    .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>));
-
-                foreach (var validatorInterface in validatorInterfaces)
-                {
-                    container.Register(validatorInterface, validatorType);
-                }
-            }
-        }
+        //    foreach (var validatorType in validatorTypes)
+        //    {
+        //        var requestType = validatorType.BaseType.GenericTypeArguments[0];
+        //        var interfaceType = typeof(IValidator<>).MakeGenericType(requestType);
+        //        container.Register(interfaceType, validatorType, Lifestyle.Scoped);
+        //    }
+        //}
     }
 }

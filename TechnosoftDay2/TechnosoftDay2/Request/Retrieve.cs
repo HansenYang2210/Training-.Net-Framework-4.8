@@ -8,6 +8,8 @@ using System.Data.Entity;
 using TechnosoftDay2.Context;
 using TechnosoftDay2.Models;
 using TechnosoftDay2.Response;
+using FluentValidation;
+using System.Collections.Generic;
 
 namespace TechnosoftDay2.Request
 {
@@ -15,9 +17,35 @@ namespace TechnosoftDay2.Request
     {
         public class ListQuery : IRequest<ListResponse>
         {
-            public int PageNumber { get; set; }
-            public int PageSize { get; set; }
+            public int? PageNumber { get; set; }
+            public int? PageSize { get; set; }
+
+            public int GetPageNumberOrDefault() => PageNumber ?? 1;
+            public int GetPageSizeOrDefault() => PageSize ?? 10;
             public string Select { get; set; } = "";
+        }
+        public class ListResponse
+        {
+            public int? PageNumber { get; set; }
+            public int? PageSize { get; set; }
+            public int TotalRecords { get; set; }
+            public List<CountryDto> Data { get; set; }
+            public bool Next { get; set; }
+        }
+        public class ListQueryValidator : AbstractValidator<ListQuery>
+        {
+            public ListQueryValidator()
+            {
+                RuleFor(x => x.PageNumber)
+            .GreaterThan(0).When(x => x.PageNumber.HasValue)
+            .WithMessage("Page number must be greater than zero.");
+
+                RuleFor(x => x.PageSize)
+                    .GreaterThan(0).When(x => x.PageSize.HasValue)
+                    .WithMessage("Page size must be greater than zero.")
+                    .LessThanOrEqualTo(100).When(x => x.PageSize.HasValue)
+                    .WithMessage("Page size must be 100 or less.");
+            }
         }
         public class ListQueryHandler : IRequestHandler<ListQuery, ListResponse>
         {
@@ -33,6 +61,9 @@ namespace TechnosoftDay2.Request
             public async Task<ListResponse> Handle(ListQuery query, CancellationToken ct)
             {
                 //var fields = query.Select.Any() ? query.Select : new List<string> { "id", "name", "versionNumber", "callingCode" };
+                var pageNumber = query.GetPageNumberOrDefault();
+                var pageSize = query.GetPageSizeOrDefault();
+
                 var countriesQuery = _context.Countries
                     .OrderByDescending(x => x.Id)
                     .AsQueryable();
@@ -40,15 +71,15 @@ namespace TechnosoftDay2.Request
 
                 var totalRecords = await _context.Countries.CountAsync(ct);
 
-                if (query.PageNumber == 0 && query.PageSize == 0)
+
+                if (query.PageSize == null)
                 {
-                    query.PageNumber = 1;
-                    query.PageSize = totalRecords;
+                    pageSize = totalRecords;
                 }
 
                 var pagedCountries = await countriesQuery.
-                    Skip((query.PageNumber - 1) * query.PageSize)
-                    .Take(query.PageSize)
+                    Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync(ct);
 
                 var responseData = pagedCountries.Select(c => new CountryDto
@@ -64,20 +95,29 @@ namespace TechnosoftDay2.Request
 
                 return new ListResponse
                 {
-                    PageNumber = query.PageNumber,
-                    PageSize = query.PageSize,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
                     TotalRecords = totalRecords,
                     Data = responseData,
                     Next = hasNextPage
                 };
             }
         }
+
         public class Query : IRequest<CountryDto>
         {
             public Guid Id { get; set; }
 
             public string Select { get; set; } = "";
 
+        }
+        public class GetQueryValidator : AbstractValidator<Query>
+        {
+            public GetQueryValidator()
+            {
+                RuleFor(x => x.Id)
+                    .NotEmpty().WithMessage("ID must be filled.");
+            }
         }
         public class QueryHandler : IRequestHandler<Query, CountryDto>
         {
