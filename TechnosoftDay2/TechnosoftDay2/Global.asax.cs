@@ -44,14 +44,10 @@ namespace TechnosoftDay2
             RegisterAutoMapper(container);
 
             //Regist FluentValidation
-            //RegisterFluentValidation(container);
-
-            //container.Register<Retrieve.ListQueryValidator>(Lifestyle.Scoped);
+            container.Register(typeof(AbstractValidator<>), Assembly.GetExecutingAssembly());
 
             //Regis Pipeline
             container.Collection.Register(typeof(INotificationHandler<>), Assembly.GetExecutingAssembly());
-            container.Collection.Register(typeof(ValidatorBehaviour<,>), Assembly.GetExecutingAssembly());
-            //container.Collection.Register(typeof(AbstractValidator<>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionAction<,>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IRequestExceptionHandler<,,>), Assembly.GetExecutingAssembly());
             container.Collection.Register(typeof(IPipelineBehavior<,>), new[]
@@ -62,12 +58,6 @@ namespace TechnosoftDay2
                 typeof(RequestPostProcessorBehavior<,>),
                 typeof(ValidatorBehaviour<,>),
             });
-            container.Register(typeof(AbstractValidator<>), Assembly.GetExecutingAssembly());
-            //container.Collection.Register(typeof(AbstractValidator<>), new[]
-            //{
-            //    typeof(Retrieve.ListQueryValidator)
-            //});
-
 
             container.Collection.Register(typeof(IRequestPreProcessor<>));
             container.Collection.Register(typeof(IRequestPostProcessor<,>));
@@ -102,21 +92,5 @@ namespace TechnosoftDay2
                 return config.CreateMapper();
             });
         }
-
-        //private void RegisterValidators(Container container)
-        //{
-        //    var validatorTypes = new[]
-        //    {
-        //    typeof(Retrieve.ListQueryValidator),
-        //    typeof(Retrieve.ListQuery),
-        //};
-
-        //    foreach (var validatorType in validatorTypes)
-        //    {
-        //        var requestType = validatorType.BaseType.GenericTypeArguments[0];
-        //        var interfaceType = typeof(IValidator<>).MakeGenericType(requestType);
-        //        container.Register(interfaceType, validatorType, Lifestyle.Scoped);
-        //    }
-        //}
     }
 }

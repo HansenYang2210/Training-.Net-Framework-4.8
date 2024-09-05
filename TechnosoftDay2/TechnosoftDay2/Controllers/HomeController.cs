@@ -28,23 +28,6 @@ namespace TechnosoftDay2.Controllers
         public async Task<IHttpActionResult> GetList(
             [FromUri] Retrieve.ListQuery query, CancellationToken cancellationToken)
         {
-            //ListQueryValidator validator = new ListQueryValidator();
-
-            //if(query != null)
-            //{
-            //    ValidationResult result = validator.Validate(query);
-            //    if (!result.IsValid)
-            //    {
-            //        var errors = result.Errors
-            //        .GroupBy(e => e.PropertyName)
-            //        .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            //        var errorResponse = new
-            //        {
-            //            Errors = errors
-            //        };
-            //        return BadRequest(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
-            //    }
-            //}
             return Ok(await _mediator.Send(query ?? new Retrieve.ListQuery(), cancellationToken));
         }
 
@@ -54,24 +37,7 @@ namespace TechnosoftDay2.Controllers
             [FromUri] Retrieve.Query query,
             CancellationToken cancellationToken)
         {
-            //GetQueryValidator validator = new GetQueryValidator();
-            //ValidationResult result = validator.Validate(query);
-            //if (!result.IsValid)
-            //{
-            //    var errors = result.Errors
-            //    .GroupBy(e => e.PropertyName)
-            //    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-
-            //    var errorResponse = new
-            //    {
-            //        Errors = errors
-            //    };
-            //    return BadRequest(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
-            //}
-            //else
-            //{
                 return Ok(await _mediator.Send(query, cancellationToken));
-            //}
         }
 
         [Route("")]
@@ -79,23 +45,7 @@ namespace TechnosoftDay2.Controllers
         public async Task<IHttpActionResult> Create(
             [FromBody] Request.Create.Command command, CancellationToken cancellationToken)
         {
-            //CreateValidator validator = new CreateValidator();
-            //ValidationResult result = validator.Validate(command);
-            //if (!result.IsValid)
-            //{
-            //    var errors = result.Errors
-            //    .GroupBy(e => e.PropertyName)
-            //    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            //    var errorResponse = new
-            //    {
-            //        Errors = errors
-            //    };
-            //    return BadRequest(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
-            //}
-            //else
-            //{
                 return Ok(await _mediator.Send(command, cancellationToken));
-            //}
         }
 
         [Route("{id:guid}")]
@@ -104,25 +54,8 @@ namespace TechnosoftDay2.Controllers
             [FromUri] Request.Update.Command command,
             [FromBody] Request.Update.Command command2, CancellationToken cancellationToken)
         {
-
-            //UpdateValidator validator = new UpdateValidator();
-            //ValidationResult result = validator.Validate(command2);
-            //if (!result.IsValid)
-            //{
-            //    var errors = result.Errors
-            //    .GroupBy(e => e.PropertyName)
-            //    .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).ToArray());
-            //    var errorResponse = new
-            //    {
-            //        Errors = errors
-            //    };
-            //    return BadRequest(Newtonsoft.Json.JsonConvert.SerializeObject(errorResponse));
-            //}
-            //else
-            //{
                 command2.Id = command.Id;
                 return Ok(await _mediator.Send(command2, cancellationToken));
-            //}
         }
 
         [Route("{id:guid}")]
