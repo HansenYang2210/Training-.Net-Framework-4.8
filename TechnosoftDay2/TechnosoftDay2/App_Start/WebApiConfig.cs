@@ -1,4 +1,5 @@
 ﻿using FluentValidation.WebApi;
+using Microsoft.AspNetCore.Cors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,9 @@ namespace TechnosoftDay2
     {
         public static void Register(HttpConfiguration config)
         {
+            //var cors = new EnableCorsAttribute("www.example.com", "*", "*");
+            //config.EnableCors(cors);
+
             FluentValidationModelValidatorProvider.Configure(config);
             // Web API configuration and services
 
