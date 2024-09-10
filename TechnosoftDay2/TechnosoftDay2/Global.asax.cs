@@ -22,6 +22,8 @@ namespace TechnosoftDay2
     {
         protected void Application_Start()
         {
+            System.Net.ServicePointManager.ServerCertificateValidationCallback =
+        (sender, cert, chain, sslPolicyErrors) => true;
             GlobalConfiguration.Configure(WebApiConfig.Register);
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -67,7 +69,8 @@ namespace TechnosoftDay2
 
             container.Verify();
             GlobalConfiguration.Configuration.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);
-            
+            GlobalConfiguration.Configuration.Filters.Add(new GlobalExceptionFilter());
+
         }
 
 

@@ -28,6 +28,7 @@ namespace TechnosoftDay2.Controllers
         public async Task<IHttpActionResult> GetList(
             [FromUri] Retrieve.ListQuery query, CancellationToken cancellationToken)
         {
+            //return BadRequest("Command cannot be null");
             return Ok(await _mediator.Send(query ?? new Retrieve.ListQuery(), cancellationToken));
         }
 
@@ -45,7 +46,9 @@ namespace TechnosoftDay2.Controllers
         public async Task<IHttpActionResult> Create(
             [FromBody] Request.Create.Command command, CancellationToken cancellationToken)
         {
-                return Ok(await _mediator.Send(command, cancellationToken));
+            //return BadRequest("Command cannot be null");
+
+            return Ok(await _mediator.Send(command, cancellationToken));
         }
 
         [Route("{id:guid}")]

@@ -12,7 +12,7 @@ namespace TechnosoftDay2
         public AutoMapperProfiles()
         {
             CreateMap<Country, CountryDto>();
-            CreateMap<CountryDto, Country>();
+            //CreateMap<CountryDto, Country>();
         }
     }
 }

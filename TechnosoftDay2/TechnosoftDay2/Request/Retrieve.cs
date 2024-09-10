@@ -19,6 +19,7 @@ namespace TechnosoftDay2.Request
         {
             public int? PageNumber { get; set; }
             public int? PageSize { get; set; }
+            public Guid ID { get; set; }
 
             public int GetPageNumberOrDefault() => PageNumber ?? 1;
             public int GetPageSizeOrDefault() => PageSize ?? 10;
@@ -68,6 +69,10 @@ namespace TechnosoftDay2.Request
                     .OrderByDescending(x => x.Id)
                     .AsQueryable();
 
+                if (query.ID.ToString() != "00000000-0000-0000-0000-000000000000")
+                {
+                    countriesQuery = countriesQuery.Where(c => c.Id.ToString() == query.ID.ToString());
+                }
 
                 var totalRecords = await _context.Countries.CountAsync(ct);
 
@@ -77,10 +82,11 @@ namespace TechnosoftDay2.Request
                     pageSize = totalRecords;
                 }
 
-                var pagedCountries = await countriesQuery.
-                    Skip((pageNumber - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync(ct);
+                var pagedCountries = await countriesQuery
+                .OrderByDescending(x => x.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(ct);
 
                 var responseData = pagedCountries.Select(c => new CountryDto
                 {
